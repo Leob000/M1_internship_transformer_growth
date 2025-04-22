@@ -153,6 +153,8 @@ $
 $
 with $X^+ = (X^top X)^(-1) X^top$ the Moore-Penrose inverse.
 
+// TODO Check théorème de Schmidt–Mirsky
+
 // Résoudre le problème suivant:
 // $
 //   arg min_(C,D) norm(B-X C D^top X^top)^2
