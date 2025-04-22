@@ -94,16 +94,67 @@ $
 
 // TODO justifier passage de l'un à l'autre
 $
-  arg min_(diff W_Q, diff W_K) norm(B - X(W_Q+diff W_Q)(W_K+ diff W_K)^top X^top )^2 \
+  arg min_(diff W_Q, diff W_K) norm(B - X(W_Q+diff W_Q)(W_K+ diff W_K)^top X^top )^2_F \
   "with" B :=nabla_S cal(L)(S) + X W_Q W_K^top X^top
 $
 // TODO rescale par gamma pour la solution
+// Precise Frobenius
 
 Which is a low rank regression (limited by $d_k$). $B$ is known.
 
 // TODO parler des deux méthodes possibles
 We can approximate $X underbrace((W_Q+diff W_Q), d_e times d_k)underbrace((W_K+ diff W_K)^top, d_k times d_e) X^top$ with a truncated SVD, taking the first $d_k$ singular values.
 
-To grow $S$ for the next training iteration, we can instead approximate by
-
 // TODO is it always?
+
+If we want to grow the inner dimension of the attention matrix by $p$ neurons, we can instead approximate by taking the first $d_(k+p)$ singular values.
+
+Hence, instead of approximating a matrix $underbrace((W_Q+diff W_Q), d_e times d_k)underbrace((W_K+ diff W_K)^top, d_k times d_e)$, we approximate
+
+$
+  underbrace(Z, d_e times d_e) = underbrace(circle(W)_Q, d_e times (d_k +p)) underbrace(circle(W)_K^top, (d_k + p) times d_e) = [W_Q + diff W_Q | underbrace(tilde(W)_Q, d_e times p)][W_K + diff W_K | underbrace(tilde(W)_K, d_e times p)]^top
+$
+with $"rank"(Z) <= d_k + p$.
+
+We then have the optimization problem
+
+$
+  arg min_(Z) norm(B - X Z X^top )^2_F.
+$
+Which is a low rank regression problem, limited by $d_k + p$.
+
+// TODO Considérer le scaling gamma
+// TODO Trouver quelle est la solution, scaled avec gamma, faire la preuve; faire attention aux hypothèses sur les rangs, notamment d_k <= d_e ?
+
+Let $f$ such that
+$
+  f(Z) = norm(B - X Z X^top )^2_F,
+$
+$f$ is convex.
+
+We have
+$
+  nabla_Z f=-2 X^top (B-X Z X^top)X,
+$
+so
+$
+  nabla_Z f = 0 <=> X^top X Z X^top X = X^top B X.
+$
+
+In the case where $d_e <= d_s$ and $"rank"(X)=d_e$, then $X^top X$ is non-singular, and we have the solution
+
+$
+  Z = (X^top X)^(-1) X^top B X (X^top X)^(-1).
+$
+
+In the general case,
+$
+  Z = X^+ B (X^+)^top,
+$
+with $X^+ = (X^top X)^(-1) X^top$ the Moore-Penrose inverse.
+
+// Résoudre le problème suivant:
+// $
+//   arg min_(C,D) norm(B-X C D^top X^top)^2
+// $
+// avec $B in RR^(d_s times d_s), X in RR^(d_s times d_e), C in RR^(d_e times d_k), D in RR^(d_e times d_k)$
