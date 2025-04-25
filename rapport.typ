@@ -29,7 +29,7 @@
 - $h$ Number of heads
 
 == Matrix
-In the case of multi-head attention, for each head $i = 1,...,h$, we have:
+In the case of multi head attention, for each head $i = 1,...,h$, we have:
 - Input $X in RR^(d_s times d_e)$
 - $W_Q_i in RR^(d_e times d_k / colMath(h,#red)), Q_i:= X W_Q_i in RR^(d_s times d_k / colMath(h,#red))$
 - $W_K_i in RR^(d_e times d_k / colMath(h,#red)), K_i:= X W_K_i in RR^(d_s times d_k / colMath(h,#red))$
@@ -138,7 +138,7 @@ $
 $
 so
 $
-  nabla_Z f = 0 <=> X^top X Z X^top X = X^top B X.
+  nabla_Z f = 0 <==> X^top X Z X^top X = X^top B X.
 $
 
 In the case where $d_e <= d_s$ and $"rank"(X)=d_e$, then $X^top X$ is non-singular, and we have the solution
@@ -157,7 +157,8 @@ If we had $d_k' >= d_e$, we could use the trivial factorization $circle(W)_Q=Z^s
 
 As most of the time $d_k' < d_e$, we have to approximate the factorization.
 
-According to the Eckart–Young–Mirsky theorem, the best approximation $Z^star_k$ of $X^+ B(X^+)^top$ with $"rank"(Z^star_k) = d_k'$ is obtained with a truncated SVD.
+// TODO Develop theorem
+According to the Eckart–Young–Mirsky theorem, the best approximation $Z^star_k'$ of $X^+ B(X^+)^top$ with $"rank"(Z^star_k') = d_k'$ is obtained with a truncated SVD.
 
 Indeed, we have
 $
@@ -165,12 +166,12 @@ $
 $
 We keep the $d_k'$ largest singular values
 $
-  U_k=[u_1,...,u_d_k'], space V_k=[v_1,...,v_d_k'], space Sigma_k="diag"(sigma_1,...,sigma_d_k').
+  U_k'=[u_1,...,u_d_k'], space V_k'=[v_1,...,v_d_k'], space Sigma_k'="diag"(sigma_1,...,sigma_d_k').
 $
 We get
 $
-  Z^star_k=U_k Sigma_k V_k^top,space "rank"(Z^star_k)\
-  circle(W)_Q^star=U_k Sigma_k^(1 / 2), space circle(W)_K^star= V_k Sigma^(1 / 2).
+  Z^star_k'=U_k' Sigma_k' V_k'^top,space "rank"(Z^star_k')=d_k'\
+  circle(W)_Q^star=U_k' Sigma_k'^(1 / 2), space circle(W)_K^star= V_k' Sigma^(1 / 2).
 $
 
 #remark[
@@ -178,3 +179,36 @@ $
     min_(circle(W_Q),circle(W_K)) norm(B-X circle(W_Q)circle(W_K)^top X^top)^2_F= sum_(i> d_k') sigma_i^2, space "subject to" "rank"(circle(W_Q)circle(W_K)^top) <= d_k'
   $
 ]
+
+#remark[
+  For implementation:
+
+  Keep the matrices apart, for example for the weight matrix of $Q$ :
+  $
+    circle(W)_Q=W'_Q+diff W'_Q + W^("new")_Q
+  $
+  with (remind that $d_k'=d_k +p$ )
+  $
+    limits(W'_Q)_(d_e times ( d_k+p )) =mat(delim: "[", augment:#3,
+        w_1,...,w_k,bold(0)_1,...,bold(0)_p;
+    ) \
+    limits(diff W'_Q)_(d_e times ( d_k+p )) =mat(delim: "[", augment:#3,
+        diff w_1,...,diff w_k,bold(0)_1,...,bold(0)_p;
+    ) \
+    limits(W^("new") _Q)_(d_e times ( d_k+p )) =mat(delim: "[", augment:#3,
+        bold(0) _1,...,bold(0) _k,w^("new") _1,...,w^("new") _p;
+    ) \
+  $
+  with any vector $w in RR^(d_e) $, and $bold(0) in RR^(d_e)$ the 0 vector.
+
+  If we wanted to account for the bias, it's the same but include a new last row for each matrix, each vector has one more element.
+]
+
+== Summary
+$
+  Z &= X^+ B(X^+ )^top \
+  &= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
+$
+
+// TODO FIXME CONTINUER Summary, PUIS CAS OU SE SIMPLIFIE, CHERCHER MEILLEUR TRUCS optimization info, PUIS FAIRE AVEC ESPERANCE, identifier pourquoi nécessitée de l'espérance, possibilité d'optimization info?
+
