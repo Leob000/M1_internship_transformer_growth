@@ -1,8 +1,8 @@
-#import "my-clean-math-paper.typ": *
+#import "template_clean_math_paper.typ": *
 
 #let date = datetime.today().display("[month repr:long] [day], [year]")
 #show: template.with(
-  title: "Typst template for mathematical papers",
+  title: "Internship report, Attention growing networks",
   authors: (
     (name: "Léo Burgund"),
     // (name: "Author 1", affiliation-id: 1, orcid: "0000-0000-0000-0000"),
@@ -31,8 +31,8 @@
 - $d_v$ Value dimension
 - $h$ Number of heads
 
-== Matrix
-We will first place ourselves in the case where $b=1$.
+== Matrix operations in an attention block
+We will first place ourselves in the case where $b=1$, we study only one instance.
 
 In the case of multi head attention, for each head $i = 1,...,h$, we have:
 - Input $X in RR^(d_s times d_e)$
@@ -143,8 +143,8 @@ $
 $
 so
 $
-  nabla_Z f = 0 <==> X^top X Z X^top X = X^top B X.
-$
+  nabla_Z f = 0 <==> X^top X Z^star X^top X = X^top B X.
+$<optimZ>
 
 In the case where $d_e <= d_s$ and $"rank"(X)=d_e$, then $X^top X$ is non-singular, and we have the solution
 
@@ -153,17 +153,45 @@ $
 $
 
 In the general case,
-$
-  Z^star = X^+ B (X^+)^top,
-$
-with $X^+ = (X^top X)^(-1) X^top$ the Moore-Penrose inverse.
+#set align(center)
+#rect(inset: 5pt)[
+  $
+    Z^star = X^+ B (X^+)^top,
+  $
+]
+#set align(left)
+with $X^+$ the pseudoinverse (Moore-Penrose).
+
+#proof[
+  Suppose $Z^star  = X^+ B(X^+ ) ^top$ . Then,
+  $
+    X^top X Z^star X^top X &= X^top X X^+ B(X^+ )^top X^top X \
+    &= X^top X X^+ B ( X^top X X^+ )^top \.
+  $
+  We have
+  $
+    X^top X X^+ &= X^top (X X^+ )^top & "by definition of the pseudoinverse"\
+    &= X^top (X^+ )^top X^top \
+    &= (X X^+ X )^top \
+    &= X^top & "by definition" \.
+  $
+  Then
+  $
+    X^top X Z^star X^top X &= X^top B X \
+  $
+  we have verified equation @eq:optimZ.
+]
+
+== Factorization
+We now have $Z^star$, which is equal to $circle(W)_Q circle(W) _K^top $, and want to factorize it to find $circle(W) _Q$ and $circle(W) _K$.
 
 If we had $d_k' >= d_e$, we could use the trivial factorization $circle(W)_Q=Z^star, circle(W)_K=I_d_e$.
 
-As most of the time $d_k' < d_e$, we have to approximate the factorization.
+However, as most of the time $d_k' < d_e$, we have to approximate the factorization.
 
 // TODO Develop theorem
-According to the Eckart–Young–Mirsky theorem, the best approximation $Z^star_k'$ of $X^+ B(X^+)^top$ with $"rank"(Z^star_k') = d_k'$ is obtained with a truncated SVD.
+
+According to the Eckart–Young–Mirsky theorem, the best approximations $breve(W) _Q$ and $breve( W) _K$ to get $breve(W) _Q breve(W) _K^top  approx Z^star$ with $"rank"(breve(W) _Q breve(W)_K^top ) = d_k'$ is obtained with a truncated SVD.
 
 Indeed, we have
 $
@@ -176,12 +204,12 @@ $
 We get
 $
   Z^star_k'=U_k' Sigma_k' V_k'^top,space "rank"(Z^star_k')=d_k'\
-  circle(W)_Q^star=U_k' Sigma_k'^(1 / 2), space circle(W)_K^star= V_k' Sigma^(1 / 2).
+  breve(W)_Q=U_k' Sigma_k'^(1 / 2), space breve(W)_K= V_k' Sigma^(1 / 2)_k'.
 $
 
 #remark[
   $
-    min_(circle(W_Q),circle(W_K)) norm(B-X circle(W_Q)circle(W_K)^top X^top)^2_F= sum_(i> d_k') sigma_i^2, space "subject to" "rank"(circle(W_Q)circle(W_K)^top) <= d_k'
+    min_(breve(W)_Q,breve(W)_K) norm(B-X breve(W)_Q breve(W)_K^top X^top)^2_F= sum_(i> d_k') sigma_i^2, space "subject to" "rank"(breve(W)_Q breve(W)_K^top) <= d_k'
   $
 ]
 
@@ -190,7 +218,7 @@ $
 
   Keep the matrices apart, for example for the weight matrix of $Q$ :
   $
-    circle(W)_Q=W'_Q+diff W'_Q + W^("new")_Q
+    breve(W)_Q=W'_Q+diff W'_Q + W^("new")_Q
   $
   with (remind that $d_k'=d_k +p$ )
   $
@@ -211,24 +239,53 @@ $
 
 == Summary
 $
-  Z&= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
+  Z &= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
   &= X^+ gradient_(S) cal(L)(S) (X^+ )^top +X^+ X W_Q W_K^top X^+ X \
-$<equation>
+$
 and
 $
-  U_k' Sigma_k' V_k'^top = "SVD"_("rank" k') (Z)
+  U_k' Sigma_k' V_k'^top = "SVD"_("trunc" k') (Z)
 $
 $
-  circle(W)_Q^star=U_k' Sigma_k'^(1 / 2), space circle(W)_K^star= V_k' Sigma^(1 / 2).
+  breve(W)_Q=U_k' Sigma_k'^(1 / 2), space breve(W)_K= V_k' Sigma^(1 / 2)_k'.
 $
 
-=== Computing efficiency for $Z$
+== Notes on Computing
+=== Mini-batch
+Note: The "Mini-batch size" can refer either to the machine batch size taken in by the GPU which can optimize computations, or the statistical batch size used to estimate a statistic (this is important as a machine batch may not be of size large enough to get a good estimation of a statistic). In this section, the mini-batch will refer to the statistical batch.
+// TODO verif rapport théo
+
+Let $b$ be the mini-batch size, and $i in {1,...,b}$.
+
+As $Z$ depends on $gradient_(S) cal(L)(S) $, the "quality" of the new weight matrices is dependant on $b$.
+// TODO develop why it is dependent on the mini-batch size
 
 
+To account for the batch, we identified two possibilities:
 
+// TODO rewrite au propre ça
+1. For each instance, calculate $Z_(i) $, get the empirical mean $dash(Z)_b$ then do $"SVD"(dash(Z)_b)$ to find $breve(W) _Q,breve(W)_K$.
+$
+  dash(Z)_(b) =EE_X [Z_(i) ] \
+  U_k' Sigma_k'V_k'^top = "SVD"_("trunc" k') (dash(Z)_(b) ) \
+  breve(W)_Q=U_k' Sigma_k'^(1 / 2), space breve(W)_K= V_k' Sigma^(1 / 2)_k'.
+$
+We do one SVD per mini-batch.
 
+2. For each instance, calculate $Z_(i) $, do $"SVD"(Z_i) $ to get $breve(W) _(Q,i),breve(W) _(K,i)  $, then get the empirical means $dash(breve(W) ) _Q, dash(breve(W) ) _K$.
+$
+  U_(k',i) Sigma_( k',i)V_( k',i)^top = "SVD"_("trunc" k') (Z_(i) ) \
+  breve(W)_(Q,i) = U_(k',i) Sigma^(1 / 2)_(k',i) , space breve(W)_(K,i) =V_(k',i) Sigma^(1 / 2)_(k',i)\
+  breve(W)_Q = dash(breve(W) )_Q = EE_X [breve(W)_(Q,i) ], space breve(W)_K = dash(breve(W) )_K = EE_X [breve(W)_(K,i) ].
+$
+Here, we do one SVD for each instance.
 
-// TODO FIXME CONTINUER Summary, PUIS CAS OU SE SIMPLIFIE, CHERCHER MEILLEUR TRUCS optimization info, PUIS FAIRE AVEC ESPERANCE, identifier pourquoi nécessitée de l'espérance, possibilité d'optimization info?
+Note: This is not counting the SVD we will have to do to find $X^+ $.
+
+// TODO Develop Z_i and link this with next section, voir ardoise pour la next section
+
+=== Computing $Z$
+
 
 
 // $

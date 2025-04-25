@@ -2,13 +2,14 @@
 #import "@preview/rich-counters:0.2.2": rich-counter
 #import "@preview/i-figured:0.2.4": reset-counters, show-equation
 
+#let currently_writing = true
+
 #let below_math = 8pt
 #let above_math = 9pt
 #let my_text_size = 11pt
 #let my_margins = (left: 25mm, right: 25mm, top: 25mm, bottom: 30mm)
 
 // Settings to see better when writing the paper
-#let currently_writing = true
 #if currently_writing {
   my_text_size = 14pt
   my_margins = (left: 5mm, right: 5mm, top: 5mm, bottom: 5mm)
@@ -66,7 +67,11 @@
 
 #let question = my-mathblock(blocktitle: [_Question_])
 
-#let proof = proofblock()
+#let proof = proofblock(
+  inset: 10pt,
+  stroke: rgb("#efe6ff"),
+  radius: 5pt,
+)
 
 // To also handle content (e.g. something like $dagger$) as affiliation-id,
 // cf. https://github.com/typst/typst/issues/2196#issuecomment-1728135476
