@@ -1,27 +1,30 @@
-#import "template.typ": *
-#import "theorems.typ": *
-#show: thmrules
+#import "my-clean-math-paper.typ": *
 
-#show: ams-article.with(
-  title: [Internship report, Attention growing networks],
+#let date = datetime.today().display("[month repr:long] [day], [year]")
+#show: template.with(
+  title: "Typst template for mathematical papers",
   authors: (
-    (
-      name: "Léo Burgund",
-      // department: [Department of Mathematics],
-      // organization: [University of Exampleville],
-      // location: [Tennessee, TN 59341],
-      email: "leo.burgund@gmail.com",
-      // url: "math.ue.edu/~jdoe"
-    ),
+    (name: "Léo Burgund"),
+    // (name: "Author 1", affiliation-id: 1, orcid: "0000-0000-0000-0000"),
   ),
-  // abstract: lorem(100),
-  bibliography: bibliography("refs.bib"),
+  affiliations: (
+    // (id: 1, name: "Affiliation 1, Address 1"),
+    // (id: "*", name: "Corresponding author")
+  ),
+  date: date,
+  heading-color: rgb("#000000"),
+  link-color: rgb("#000082"),
+  // abstract: [This is my abstract...],
+  // keywords: ("First keyword", "Second keyword", "etc."),
+  // AMS: ("65M70", "65M12"),
 )
 
+#let colMath(x, color) = text(fill: color)[$#x$]
+#let ip(x, y) = $lr(angle.l #x, #y angle.r)$
 
 = Nomenclature
 == Dimensions
-- $b$ Batch
+- $b$ Mini-batch size
 - $d_e$ Embedding dimension
 - $d_s$ Sequence length
 - $d_k$ Query/Keys dimension
@@ -29,6 +32,8 @@
 - $h$ Number of heads
 
 == Matrix
+We will first place ourselves in the case where $b=1$.
+
 In the case of multi head attention, for each head $i = 1,...,h$, we have:
 - Input $X in RR^(d_s times d_e)$
 - $W_Q_i in RR^(d_e times d_k / colMath(h,#red)), Q_i:= X W_Q_i in RR^(d_s times d_k / colMath(h,#red))$
@@ -206,9 +211,41 @@ $
 
 == Summary
 $
-  Z &= X^+ B(X^+ )^top \
-  &= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
+  Z&= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
+  &= X^+ gradient_(S) cal(L)(S) (X^+ )^top +X^+ X W_Q W_K^top X^+ X \
+$<equation>
+and
 $
+  U_k' Sigma_k' V_k'^top = "SVD"_("rank" k') (Z)
+$
+$
+  circle(W)_Q^star=U_k' Sigma_k'^(1 / 2), space circle(W)_K^star= V_k' Sigma^(1 / 2).
+$
+
+=== Computing efficiency for $Z$
+
+
+
+
 
 // TODO FIXME CONTINUER Summary, PUIS CAS OU SE SIMPLIFIE, CHERCHER MEILLEUR TRUCS optimization info, PUIS FAIRE AVEC ESPERANCE, identifier pourquoi nécessitée de l'espérance, possibilité d'optimization info?
 
+
+// $
+//   alpha=1
+// $<refeq>
+// @eq:refeq
+//
+// #theorem(title: "Example Theorem")[
+//   this is a thm
+// ]<refthm>
+// This is its ref @refthm.
+//
+// To get a bibliography, we also add a citation @Cooley65.
+//
+// #bibliography("bibliography.bib")
+//
+// // Create appendix section
+// #show: appendices
+// = test
+// #lorem(10)
