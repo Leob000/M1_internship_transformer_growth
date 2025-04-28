@@ -240,7 +240,6 @@ $
 == Summary
 $
   Z &= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
-  &= X^+ gradient_(S) cal(L)(S) (X^+ )^top +X^+ X W_Q W_K^top X^+ X \
 $
 and
 $
@@ -282,10 +281,69 @@ Here, we do one SVD for each instance.
 
 Note: This is not counting the SVD we will have to do to find $X^+ $.
 
-// TODO Develop Z_i and link this with next section, voir ardoise pour la next section
+// TODO Which method to choose?
+We choose the first method as it requires only one SVD, which may require less computational ressources, and may truncate (through the SVD) less valuable "information" away, as the SVD is applied after the mean.
 
-=== Computing $Z$
+=== Computing $Z_i$
+We denote different ways to compute $Z_(i) $.
 
+$
+  Z = X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top
+$<Z1>
+$
+  Z= X^+ gradient_(S) cal(L)(S) (X^+ )^top +X^+ X W_Q W_K^top X^+ X
+$<Z2>
+
+$Z_(i) $ can either be computed by using @eq:Z1, or @eq:Z2, which can be further decomposed.
+
+- If $"rank"(X) = d_e$ :
+$
+  X^+ =(X^top X)^(-1) X^top => X^+ X=I_d_e
+$
+$
+  Z= X^+ gradient_(S) cal(L)(S) (X^+ )^top + W_Q W_K^top
+$
+- If $"rank"(X)=d_s $ :
+$
+  X^+ =X^top (X X^top )^(-1) => X^+ X=X^top (X^top X)^(-1) X
+$
+$
+  Z= X^+ gradient_(S) cal(L)(S) (X^+ )^top + X^top (X X^top )^(-1) X W_Q W_K^top X^top (X X^top )^(-1) X
+$
+- In the general case , with $r="rank"(X) $ :
+$
+  Z= X^+ gradient_(S) cal(L)(S) (X^+ )^top +
+  V_X mat(
+    underbrace(I_r, r times r) , 0;0,underbrace(0, (e-r)times(e-r) )
+) V_X^top
+  W_Q W_K^top
+  V_X mat(
+    underbrace(I_r, r times r) , 0;0,underbrace(0, (e-r)times(e-r) )
+) V_X^top .
+$
+#proof[
+  We compute the SVD for $X$,
+  $
+    underbrace(X, d_s times d_e) =underbrace(U_X, d_s times d_s) underbrace(Sigma_X, d_s times d_e) underbrace(V_X^top, d_e times d_e) , space X^+ =V_X underbrace(Sigma^(+) _X, d_e times d_s) U_X^top
+  $
+  $
+    X^+ X=V_X Sigma^(+)_X U_X^top U_X Sigma_X V_X^top = V_X Sigma^(+)_X Sigma_X V_X^top
+  $
+  with
+  $
+    Sigma^(+)_X Sigma_X= mat(
+        underbrace(Sigma^(-1) _r, r times r) ,0;0,underbrace(0, (e-r)times(s-r)  )
+    )
+    mat(
+        underbrace(Sigma_r, r times r) , 0;0, underbrace(0, (s-r) times(e-r) )
+    ) =
+    mat(
+        underbrace(I_r, r times r),0;0, underbrace(0, (e-r) times(e-r) )
+    )
+  $
+]
+
+// TODO Voir steph si c'est utile ou non
 
 
 // $
