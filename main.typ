@@ -100,8 +100,13 @@ $
 // TODO justifier passage de l'un à l'autre
 $
   arg min_(diff W_Q, diff W_K) norm(B - X(W_Q+diff W_Q)(W_K+ diff W_K)^top X^top )^2_F \
-  "with" B :=nabla_S cal(L)(S) + X W_Q W_K^top X^top
 $
+with
+$
+  B :&=nabla_S cal(L)(S) + X W_Q W_K^top X^top\
+  &= gradient_(S) cal(L)(S) + sqrt(d_k/h) S \
+$
+// TODO Rajouter le moins devant le gradient
 // TODO rescale par gamma pour la solution
 // Precise Frobenius
 
@@ -119,6 +124,9 @@ Hence, instead of approximating a matrix $underbrace((W_Q+diff W_Q), d_e times d
 $
   underbrace(Z, d_e times d_e) = underbrace(circle(W)_Q, d_e times (d_k')) underbrace(circle(W)_K^top, (d_k') times d_e) = [W_Q + diff W_Q | underbrace(tilde(W)_Q, d_e times p)][W_K + diff W_K | underbrace(tilde(W)_K, d_e times p)]^top
 $
+//TODO: Attention, change toute la matrice d'attention, trouver moyen de ne pas faire ça? (car considère le produit entier W_Q W_K^T et pas la somme de l'ancien et du nouveau ajouté)
+//(résonner sur delta S, pas S+delta S?)
+//TODO Trouver le facteur gamma du problème de base
 with $"rank"(Z) <= d_k'$ (we make the hypothesis that $d_k' < d_e$).
 
 We then have the optimization problem
@@ -156,8 +164,9 @@ In the general case,
 #set align(center)
 #rect(inset: 5pt)[
   $
-    Z^star = X^+ B (X^+)^top,
+    Z^star = X^+ B (X^+)^top = X^+ (gradient_(S) cal(L)(S) + sqrt(d_k/h)S ) (X^+ )^top ,
   $
+  // TODO: Check pseudoinverse computation
 ]
 #set align(left)
 with $X^+$ the pseudoinverse (Moore-Penrose).
@@ -240,6 +249,7 @@ $
 == Summary
 $
   Z &= X^+ (gradient_(S) cal(L)(S)+ X W_Q W_K^top X^top )(X^+ )^top \
+  &= X^+ (gradient_(S) cal(L)(S) + sqrt(d_k/h) S) (X^+ )^top \
 $
 and
 $
@@ -285,6 +295,8 @@ Note: This is not counting the SVD we will have to do to find $X^+ $.
 We choose the first method as it requires only one SVD, which may require less computational ressources, and may truncate (through the SVD) less valuable "information" away, as the SVD is applied after the mean.
 
 === Computing $Z_i$
+Note: This is probably useless since we already have computed $S= X W_Q W_K^top X^top $ during the forward pass.
+
 We denote different ways to compute $Z_(i) $.
 
 $
@@ -344,6 +356,7 @@ $
 ]
 
 // TODO Voir steph si c'est utile ou non
+// TODO add reconstruction error
 
 
 // $
