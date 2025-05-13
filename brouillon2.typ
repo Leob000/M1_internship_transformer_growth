@@ -46,7 +46,7 @@ $
   &= X W_Q dif W_K^top X^top +X dif W_Q W_K^top X^top +X dif W_Q dif W_K^top X^top \
   &= X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top +o(norm(dif W_Q) dot norm(dif W_K) )\
 $<dS1>
-#emoji.fire Link between the two approximations $o(norm(dif S) )$ and $o(norm(dif W_Q) dot norm(dif W_K) )$, is it okay to do the later as we did the former?
+#emoji.fire Verify and justify that it is ok to drop $o(norm(dif W_Q) dot norm(dif W_K) )$ (and i there a link with $o(norm(dif S) )$ ?)
 
 We will consider that $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top$.
 
@@ -59,8 +59,6 @@ $
 with $gamma in RR_+$.
 
 $gamma$ is similar to the learning rate, and constrains $dif S$ to respect the first order approximation.
-
-#emoji.fire Then $gamma$ must always be small? How small?
 
 ---
 
@@ -129,3 +127,6 @@ $
   Delta W_K^star &= - gamma / rho T^top W_Q\
 $
 
+#emoji.fire We made two approximations for this result, the first order approximation and the elimination of the quadratic term $X dif W_Q dif W_K^top X^top$. We should study the consequences it can have, in particular on the validity of the results if $gamma$ or $alpha$ are big, where the quadratic term could become more significant.
+
+Same for the comparaison between $norm(dif W_Q) dot norm(dif W_K)$ and $norm(W_Q) dot norm(dif W_K) + norm(dif W_Q) dot norm(W_K)$.
