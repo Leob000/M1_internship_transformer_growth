@@ -102,7 +102,7 @@ $
 
 and
 $
-  dif S^((0) ) :=cal(A) (Delta W_Q^((0) ) ,Delta W_K^((0) ) ), space rho:= norm(dif S^(0))_F
+  dif S^((0) ) :=cal(A) (Delta W_Q^((0) ) ,Delta W_K^((0) ) ), space rho:= norm(dif S^(( 0)))_F
 $
 We make the hypothesis that $rho !=0$, as we just have to skip the update if it is $0$.
 
@@ -119,4 +119,13 @@ We then have
 $
   norm(cal(A) (Delta W_Q ,Delta W_K )))_F=alpha rho=gamma
 $
-so the pair $Delta W_Q, Delta W_K$ have the best minimizing direction of problem @eq:P, while respecting the norm constraint.
+so the pair $Delta W_Q, Delta W_K$ have the best minimizing direction for the problem @eq:P, while respecting the norm constraint.
+
+We the have the closed form expressions
+$
+  rho &= X(W_Q (-T^top W_Q)^top - T W_K W_K^top ) X^top \
+  &= -X(W_Q W_Q^top T + T W_K W_K^top ) X^top \
+  Delta W_Q^star &= - gamma / rho T W_K \
+  Delta W_K^star &= - gamma / rho T^top W_Q\
+$
+
