@@ -89,16 +89,34 @@ $
   arg min_(dif W_Q, dif W_K) ip(dif W_Q, T W_K)+ip(dif W_K, T^top W_Q) space "s.t." norm(X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top)=gamma
 $
 
-Hence the "raw directions" to minimize the scalar products are
+Hence the "raw directions" of steepest descent to minimize the scalar products are
 $
-  Delta W_Q=-T W_K\
-  Delta W_K = -T^top W_Q
-$
-
-Finally, we have: (#emoji.fire verify, circular equation?)
-$
-  dif W_Q^* =-alpha T W_K\
-  dif W_K^* =-alpha T^top W_Q\
-  alpha= gamma / (norm(X(W_Q dif W_K^*^top + dif W_Q^* W_K^top ) X^top) )
+  Delta W_Q^(( 0)) =-T W_K\
+  Delta W_K^(( 0)) = -T^top W_Q
 $
 
+We define the linear operator
+$
+  cal(A) (Delta W_Q^((0) ) ,Delta W_K^((0) ) ) :=X(W_Q Delta W_K^top + Delta W_Q W_K^top ) X^top
+$
+
+and
+$
+  dif S^((0) ) :=cal(A) (Delta W_Q^((0) ) ,Delta W_K^((0) ) ), space rho:= norm(dif S^(0))_F
+$
+We make the hypothesis that $rho !=0$, as we just have to skip the update if it is $0$.
+
+We define
+$
+  alpha:=gamma / rho
+$
+and
+$
+  Delta W_Q:= alpha Delta W_Q^((0) ) , space Delta W_K^((0) ) :=alpha Delta W_K^((0) )
+$
+
+We then have
+$
+  norm(cal(A) (Delta W_Q ,Delta W_K )))_F=alpha rho=gamma
+$
+so the pair $Delta W_Q, Delta W_K$ have the best minimizing direction of problem @eq:P, while respecting the norm constraint.

@@ -12,7 +12,7 @@
 // Settings to see better when writing the paper
 #if currently_writing {
   my_text_size = 14pt
-  my_margins = (left: 5mm, right: 5mm, top: 5mm, bottom: 5mm)
+  my_margins = (left: 5mm, right: 5mm, top: 5mm, bottom: 10mm)
 }
 
 
