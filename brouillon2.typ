@@ -23,6 +23,9 @@
 #let ip(x, y) = $lr(angle.l #x, #y angle.r)$
 
 = Problem
+== heading 2
+=== heading 3
+==== heading 4
 Goal:
 $
   min_f cal(L) (f).
@@ -46,9 +49,58 @@ $
   &= X W_Q dif W_K^top X^top +X dif W_Q W_K^top X^top +X dif W_Q dif W_K^top X^top \
   &= X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top +o(norm(dif W_Q) dot norm(dif W_K) )\
 $<dS1>
-#emoji.fire Verify and justify that it is ok to drop $o(norm(dif W_Q) dot norm(dif W_K) )$ (and i there a link with $o(norm(dif S) )$ ?)
+We define
+$
+  dif S_"linear"&:= X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top\
+  dif S_"full" &:= X W_Q dif W_K^top X^top +X dif W_Q W_K^top X^top +X dif W_Q dif W_K^top X^top \
+$
 
-We will consider that $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top$.
+
+== Study of $dif S$
+=== Searching for bounds
+We can find an upper bound for the quadratic term, we have, according to @ineqFrobSpecProduct:
+$
+  norm(dif S_"quad")_F := norm(X dif W_Q dif W_K^top X^top)_F <= norm(X)_2 norm(dif W_Q dif W_K^top)_F\
+$
+we have
+$
+  norm(dif W_Q dif W_K^top)_F <= norm(dif W_Q)_F norm(dif W_K^top)_2= norm(dif W_Q)_F norm(dif W_K)_2<= norm(dif W_Q)_F norm(dif W_K)_F\
+$
+hence,
+$
+  norm(dif S_"quad")_F <= norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F
+$
+
+We also have an upper bound for the linear term, (#emoji.fire useless?)
+$
+  norm(dif S_"linear")_F:= norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F& <= norm(X W_Q dif W_K^top X^top)_F + norm(X dif W_Q W_K^top X^top)_F\
+  &<= norm(X)_2 norm(W_Q)_F norm(dif W_K)_F + norm(X)_2 norm(dif W_Q)_F norm(W_K)_F\
+  &<= norm(X)_2 (norm(W_Q)_F norm(dif W_K)_F+ norm(dif W_Q)_F norm(W_K)_F)
+$
+
+And a lower bound,
+$
+  norm(dif S_"linear") &>= abs(norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F)
+$
+
+Hence
+$
+  norm(dif S_"quad") / norm(dif S_"linear") <= (norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F) / (abs((norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F )) )
+$
+
+=== Direct form
+We also have the direct form
+$
+  norm(dif S_"quad") / norm(dif S_"linear") = (norm(X dif W_Q dif W_K^top X^top)_F) / (norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F)
+$
+
+
+
+We can consider two different approaches, either picking $dif S_"full"$ or $dif S_"linear"$.
+
+#emoji.fire How and when to choose $dif S_"full"$ or $dif S_"linear"$?
+
+== Problem continuation
 
 ---
 
@@ -72,6 +124,7 @@ $
   ( <==>& gamma dot arg min_(dif S) ip(G, dif S) "s.t." norm(dif S) =1)\
 $<P>
 
+== Linear approach, $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top$
 We have
 $
   ip(G, dif S)&= ip(G, X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top) \
@@ -127,6 +180,46 @@ $
   Delta W_K^star &= - gamma / rho T^top W_Q\
 $
 
-#emoji.fire We made two approximations for this result, the first order approximation and the elimination of the quadratic term $X dif W_Q dif W_K^top X^top$. We should study the consequences it can have, in particular on the validity of the results if $gamma$ or $alpha$ are big, where the quadratic term could become more significant.
 
-Same for the comparaison between $norm(dif W_Q) dot norm(dif W_K)$ and $norm(W_Q) dot norm(dif W_K) + norm(dif W_Q) dot norm(W_K)$.
+
+== Quadratic approach, $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top + dif W_Q dif W_K^top) X^top$
+
+
+#show: appendices
+=
+#lemma[
+  Let $M in RR^(m times n)$, $sigma_1 >=...>= sigma_(min(m, n) )$ its singular in decreasing order, and $M=U Sigma V^top$ its SVD decomposition.
+  $
+    norm(M)^2_F&=tr(M M^top)
+    = tr(U Sigma V^top V Sigma^top U^top)
+    = tr(U Sigma Sigma^top U^top)
+    = tr(U^top U Sigma Sigma^top) \
+    &= tr(Sigma Sigma^top)
+    = norm(Sigma)^2_F =sum_(i)^(min(m, n) ) sigma_i^2 \
+    &>= sigma_1 = norm(M)^2_2
+  $
+  Hence $norm(M)_F>= norm(M)_2$.
+]<ineqFrobSpec>
+
+#lemma[
+  We know (bound on the Rayleigh quotient) that for any symmetric positive semidefinite matrix $M$ and any vector $x$,
+  $
+    x^top M x <= lambda_max (M) norm(x)^2.
+  $
+  Let $A in RR^(m times p)$, $B in RR^(p times n)$, $(a_1,...,a_m)$ the row vectors of $A$.
+
+  Then
+  $
+    norm(A B)^2_F&=tr(A (B B^top ) A^top) \
+    &= sum_(i=1)^(m) a_(i) (B B^top ) a_t^top \
+    &<= sum_(i=1)^(m) lambda_max (B B^top ) norm(a_(i))^2 = lambda_max (B B^top ) tr(A A^top) =norm(B)^2_2 norm(A)^2_F
+  $
+  Hence $norm(A B)_F <= norm(B)_2 norm(A)_F$.
+
+  The same reasoning can be applied to prove $norm(A B)_F <= norm(A)_2 norm(B)_F$.
+
+  Moreover, let $C in RR^(n times o)$, we have
+  $
+    norm(A B C)_F = norm((A B) C)_F <=norm(A B)_F norm(C)_2 <= norm(A)_2 norm(B)_F norm(C)_2.
+  $
+]<ineqFrobSpecProduct>

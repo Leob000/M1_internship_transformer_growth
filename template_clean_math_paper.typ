@@ -8,11 +8,17 @@
 #let above_math = 9pt
 #let my_text_size = 11pt
 #let my_margins = (left: 25mm, right: 25mm, top: 25mm, bottom: 30mm)
+#let heading1_size = 14pt
+#let heading2_size = 12pt
+#let heading3_4_size = 11pt
 
 // Settings to see better when writing the paper
 #if currently_writing {
   my_text_size = 14pt
   my_margins = (left: 5mm, right: 5mm, top: 5mm, bottom: 10mm)
+  heading1_size = 17pt
+  heading2_size = 15pt
+  heading3_4_size = 14pt
 }
 
 
@@ -122,8 +128,11 @@
 
   // Heading settings.
   set heading(numbering: "1.1")
-  show heading.where(level: 1): set text(size: 14pt, fill: heading-color)
-  show heading.where(level: 2): set text(size: 12pt, fill: heading-color)
+  show heading.where(level: 1): set text(size: heading1_size, fill: heading-color)
+  show heading.where(level: 2): set text(size: heading2_size, fill: heading-color)
+  show heading.where(level: 3): set text(size: heading3_4_size, fill: heading-color)
+  show heading.where(level: 4): set text(size: heading3_4_size, fill: heading-color)
+
 
   // Equation settings.
   // Using i-figured:
