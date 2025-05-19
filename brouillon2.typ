@@ -23,9 +23,6 @@
 #let ip(x, y) = $lr(angle.l #x, #y angle.r)$
 
 = Problem
-== heading 2
-=== heading 3
-==== heading 4
 Goal:
 $
   min_f cal(L) (f).
@@ -56,51 +53,7 @@ $
 $
 
 
-== Study of $dif S$
-=== Searching for bounds
-We can find an upper bound for the quadratic term, we have, according to @ineqFrobSpecProduct:
-$
-  norm(dif S_"quad")_F := norm(X dif W_Q dif W_K^top X^top)_F <= norm(X)_2 norm(dif W_Q dif W_K^top)_F\
-$
-we have
-$
-  norm(dif W_Q dif W_K^top)_F <= norm(dif W_Q)_F norm(dif W_K^top)_2= norm(dif W_Q)_F norm(dif W_K)_2<= norm(dif W_Q)_F norm(dif W_K)_F\
-$
-hence,
-$
-  norm(dif S_"quad")_F <= norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F
-$
 
-We also have an upper bound for the linear term, (#emoji.fire useless?)
-$
-  norm(dif S_"linear")_F:= norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F& <= norm(X W_Q dif W_K^top X^top)_F + norm(X dif W_Q W_K^top X^top)_F\
-  &<= norm(X)_2 norm(W_Q)_F norm(dif W_K)_F + norm(X)_2 norm(dif W_Q)_F norm(W_K)_F\
-  &<= norm(X)_2 (norm(W_Q)_F norm(dif W_K)_F+ norm(dif W_Q)_F norm(W_K)_F)
-$
-
-And a lower bound,
-$
-  norm(dif S_"linear") &>= abs(norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F)
-$
-
-Hence
-$
-  norm(dif S_"quad") / norm(dif S_"linear") <= (norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F) / (abs((norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F )) )
-$
-
-=== Direct form
-We also have the direct form
-$
-  norm(dif S_"quad") / norm(dif S_"linear") = (norm(X dif W_Q dif W_K^top X^top)_F) / (norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F)
-$
-
-
-
-We can consider two different approaches, either picking $dif S_"full"$ or $dif S_"linear"$.
-
-#emoji.fire How and when to choose $dif S_"full"$ or $dif S_"linear"$?
-
-== Problem continuation
 
 ---
 
@@ -119,12 +72,13 @@ The solution $dif S$ has a norm $norm(dif S) =gamma$ when there exists a $dif S$
 We make the hypothesis that we can always find such a $dif S$.
 
 We then have the following problem:
+
 $
   &arg min_(dif S) ip(G, dif S) space "s.t." norm(dif S)=gamma \
   ( <==>& gamma dot arg min_(dif S) ip(G, dif S) "s.t." norm(dif S) =1)\
 $<P>
 
-== Linear approach, $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top$
+== Linear approach, $dif S =dif S_"linear"$
 We have
 $
   ip(G, dif S)&= ip(G, X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top) \
@@ -139,6 +93,8 @@ The problem now is
 $
   arg min_(dif W_Q, dif W_K) ip(dif W_Q, T W_K)+ip(dif W_K, T^top W_Q) space "s.t." norm(X(W_Q dif W_K^top +dif W_Q W_K^top ) X^top)=gamma
 $
+
+#emoji.fire The following is false, to change..
 
 Hence the "raw directions" of steepest descent to minimize the scalar products are
 $
@@ -168,7 +124,7 @@ $
 
 We then have
 $
-  norm(cal(A) (Delta W_Q ,Delta W_K )))_F=alpha rho=gamma
+  norm(cal(A) (Delta W_Q ,Delta W_K ))_F=alpha rho=gamma
 $
 so the pair $Delta W_Q, Delta W_K$ have the best minimizing direction for the problem @eq:P, while respecting the norm constraint.
 
@@ -181,9 +137,122 @@ $
 $
 
 
+== Quadratic approach, $dif S =dif S_"full"$
+We can define
+$
+  dif S (x) &= X(W_Q + x dif W_Q)(W_K +x dif W_K)^top X^top -X W_Q W_K^top X^top \
+  &= X(x W_Q dif W_K^top +x dif W_Q W_K^top +x^2 dif W_Q dif W_K^top ) X^top
+$
 
-== Quadratic approach, $dif S =X(W_Q dif W_K^top +dif W_Q W_K^top + dif W_Q dif W_K^top) X^top$
+Using first order approximation, should we study: (with $G = gradient_(S) cal(L)(S)$)
+$
+  cal(L) (S+dif S(gamma) ) =cal(L)(S) + ip(G, dif S(gamma)) + o(norm((dif S(gamma) )) )
+$
+// We will find $gamma$ later, with a line search.
 
+== Problem A
+We have $X in RR^( d_s times d_e)$, $G = gradient_(S) cal(L)(S) in RR^(d_s times d_s)$, $W_Q "and" W_K in RR^(d_e times d_k)$, $d_e > d_k$, $gamma in (0,oo)$.
+
+The problem is:
+$
+  arg min_(gamma, dif S(gamma) ) ip(G, dif S(gamma))
+$
+We have
+$
+  ip(G, dif S(gamma)) &= ip(G, X(gamma W_Q dif W_K^top + gamma dif W_Q W_K^top + gamma^2 dif W_Q dif W_K^top ) X^top) \
+  &= gamma ip(X^top G X, W_Q dif W_K^top + dif W_Q W_K^top + gamma dif W_K dif W_K^top) \
+$
+
+Let $T=X^top G X$, $R(gamma) = W_Q dif W_K^top + dif W_Q W_K^top + gamma dif W_K dif W_K^top$
+
+We have $"rank"(R(gamma) ) = d_k < "rank"(T)$
+
+The problem now is:
+$
+  arg min_(gamma, R(gamma) ) gamma ip(T, R(gamma)) "s.t." "rank"(T)>"rank"(R(gamma) ) \
+$
+
+== Problem B
+We have a self-attention block. $X$ is the input, $d_s$ the sequence length, $d_e$ the embedding size, $d_k$ the key/query size.
+
+We have $X in RR^( d_s times d_e)$, $G = gradient_(S) cal(L)(S) in RR^(d_s times d_s)$, $W_Q "and" W_K in RR^(d_e times d_k)$, $d_e > d_k$.
+
+The idea is start with a low $d_k$ hence low expressivity, and "grow new neurons", by increasing $d_k$ by $p$.
+
+Let $Z'= (W_Q + gamma dif W_Q)(W_K+ gamma dif W_K)^top$, $"rank"(Z')=d_k$.
+
+We want to find the augmented matrix $Z$, such that $"rank"(Z)=d_k+p$. We basically concatenate $p$ new columns to the matrices $(W_Q + gamma dif W_Q)$ and $(W_K + gamma dif W_K)$, to augment their expressive possibility.
+
+#emoji.fire Question: What would be the best expression for $Z$, to respect the previously introduced "step" $gamma$?
+$
+  Z= [W_Q + gamma dif W_Q bar gamma W_Q^("new") ] [W_K + gamma dif W_K bar gamma W_K^("new") ]^top ?
+$
+
+
+#emoji.fire Would augmenting $Z'$ into $Z$ cause problems with the first order approximation?
+
+The problem is:
+$
+  arg min_(Z ) ip(X^top G X, Z - W_Q W_K^top)
+$
+
+
+
+== Study of $dif S$
+=== Brouillon: Searching for bounds
+We can find an upper bound for the quadratic term, we have, according to @ineqFrobSpecProduct:
+$
+  norm(dif S_"quad")_F := norm(X dif W_Q dif W_K^top X^top)_F <= norm(X)_2 norm(dif W_Q dif W_K^top)_F\
+$
+we have
+$
+  norm(dif W_Q dif W_K^top)_F <= norm(dif W_Q)_F norm(dif W_K^top)_2= norm(dif W_Q)_F norm(dif W_K)_2<= norm(dif W_Q)_F norm(dif W_K)_F\
+$
+hence,
+$
+  norm(dif S_"quad")_F <= norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F
+$
+
+We also have an upper bound for the linear term, (useless?)
+$
+  norm(dif S_"linear")_F:= norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F& <= norm(X W_Q dif W_K^top X^top)_F + norm(X dif W_Q W_K^top X^top)_F\
+  &<= norm(X)_2 norm(W_Q)_F norm(dif W_K)_F + norm(X)_2 norm(dif W_Q)_F norm(W_K)_F\
+  &<= norm(X)_2 (norm(W_Q)_F norm(dif W_K)_F+ norm(dif W_Q)_F norm(W_K)_F)
+$
+
+And a lower bound,
+$
+  norm(dif S_"linear") &>= abs(norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F)
+$
+
+Hence
+$
+  norm(dif S_"quad") / norm(dif S_"linear") <= (norm(X)_2 norm(dif W_Q)_F norm(dif W_K)_F) / (abs((norm(X W_Q dif W_K^top X^top)_F - norm(X dif W_Q W_K^top X^top)_F )) )
+$
+
+=== Brouillon: Other bound attempt
+Applying @ineqFrobSpecProduct, we have
+$
+  (sigma_min (X)^2 ) / (sigma_max (X)^2 ) norm(dif W_Q dif W_K^top)_F / norm(W_Q dif W_K^top + dif W_Q W_K^top)_F <= norm(dif S_"quad") / norm(dif S_"linear") <= (sigma_max (X)^2 ) / (sigma_min (X)^2 ) norm(dif W_Q dif W_K^top)_F / norm(W_Q dif W_K^top + dif W_Q W_K^top)_F
+$
+Hence if $sigma_min (X)$ and $sigma_max (X)$ are close,
+$
+  norm(dif S_"quad") / norm(dif S_"linear") approx norm(dif W_Q dif W_K^top)_F / norm(W_Q dif W_K^top + dif W_Q W_K^top)_F
+$
+
+
+
+=== Direct form
+We also have the direct form
+$
+  norm(dif S_"quad") / norm(dif S_"linear") = (norm(X dif W_Q dif W_K^top X^top)_F) / (norm(X(W_Q dif W_K^top + dif W_Q W_K^top ) X^top)_F)
+$
+
+
+
+We can consider two different approaches, either picking $dif S_"full"$ or $dif S_"linear"$.
+
+#emoji.fire How and when to choose $dif S_"full"$ or $dif S_"linear"$?
 
 #show: appendices
 =
@@ -216,6 +285,8 @@ $
   $
   Hence $norm(A B)_F <= norm(B)_2 norm(A)_F$.
 
+  We can prove the same way that $norm(A B)_F >= sigma_min (B) norm(A)_F$.
+
   The same reasoning can be applied to prove $norm(A B)_F <= norm(A)_2 norm(B)_F$.
 
   Moreover, let $C in RR^(n times o)$, we have
@@ -223,3 +294,4 @@ $
     norm(A B C)_F = norm((A B) C)_F <=norm(A B)_F norm(C)_2 <= norm(A)_2 norm(B)_F norm(C)_2.
   $
 ]<ineqFrobSpecProduct>
+
