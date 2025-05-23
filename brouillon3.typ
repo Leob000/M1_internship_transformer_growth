@@ -132,5 +132,28 @@ Then get the new weight matrices
 $
   W_Q_(+1) ,W_K_(+1) = "SVD"_"LR" (Z + lambda^star dif Z^(0) )
 $
+== Testing coming from the first order approximation
+$
+  cal(L) (S + gamma dif S) &= cal(L) (S) + gamma ip(G, dif S) + o(norm(dif S) ) \
+  &= cal(L) (S) + gamma ip(G, X dif Z X^top) + o(norm(dif S) ) \
+  &= cal(L) (S) + gamma ip(X^top G X, dif Z) + o(norm(dif S) ) \
+$
+#emoji.fire No constraint, during the first order approx, allows to put the norm constraint after? Something like
+$
+  arg min_(dif Z) ip(X^top G X, dif Z)_F "s.t." norm(dif Z)_F <= gamma and "rk"(dif Z) <= "rk"( X^top G X)
+$
+
+== Idea
+$
+  norm(dif S)_F &= norm(X dif Z X)_F \
+  &<= norm(X)_2^2 norm(dif Z)_F\
+$
+We also have
+$
+  sigma_min^2 (X) norm(dif Z)_F<= norm(dif S)_F
+$
+So if there exist $sigma_min^2 >=0 <==> X "full rank"$, then $norm(dif S)$ has a positive lower bound.
+
+
 
 = Full problem

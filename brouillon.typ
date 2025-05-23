@@ -190,6 +190,8 @@ with $X^+$ the pseudoinverse (Moore-Penrose).
     X^top X Z^star X^top X &= X^top B X \
   $
   we have verified equation @eq:optimZ.
+
+  #emoji.fire this is false as we prove only one way, but true under the assumption that $X^top X$ is non-singular.
 ]
 
 == Factorization
