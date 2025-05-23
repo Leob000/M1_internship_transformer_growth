@@ -137,14 +137,16 @@ $
   &= (X^top X )^+ X^top G X (X^top X )^+ \
   &= X^+ G (X^+ )^top \
 $
-#emoji.fire Which formula to implement?
+#emoji.fire Which formula to implement for $P^star$ ?
 
 To account for the batch, there are several ways to average:
 $
   EE_X [(X^top X)^+ X^top G X (X^top X )^+ ] = EE_X [X^+ G ( X^+ )^top ] \
   EE_X [X^top X]^+ EE_X [X^top G X] EE_X [X^top X]^+ \
   EE_X [X]^+ EE_X [G] (EE_X [X]^+ )^top \
+  EE_X [X^top X]^(-1) EE_X [X^top G X] EE_X [X^top X]^(-1) \
 $
+#emoji.fire Which batch average?
 
 == Line search
 Do a line search to find $lambda$
@@ -156,6 +158,6 @@ $
 === Testing fast way
 Lose the rank constraint, but lose the SVD so faster. Get a good approximation of $lambda$ ?
 $
-  cal(L) (X ( W_Q^(t)W_K^t^top -lambda P)X^top )
+  cal(L) (X ( W_Q^(t)W_K^t^top -lambda P)X^top ) &= cal(L) (X W_Q^t W_K^t^top X^top - lambda X P X^top ) \
 $
 
