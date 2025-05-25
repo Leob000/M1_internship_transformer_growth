@@ -48,7 +48,7 @@ In the case of multi head attention, for each head $i = 1,...,h$, we have:
 
 For now, we study the case $h=1$.
 
-#emoji.fire We omit the $1 / sqrt(d_k)$ scaling for the $S$ matrix, it can cause problem with growing, so for growing we will make it a learnable parameter (and initialize it at $1 / sqrt(d_k_"initial")$ ?). Or maybe scale with $(sqrt(d_k) / sqrt(d_k +p) )$?
+#emoji.fire We omit the $1 / sqrt(d_k)$ scaling for the $S$ matrix, it can cause problem with growing, so for growing we will make it a learnable parameter (and initialize it at $1 / sqrt(d_k_"initial")$ ?). Or maybe scale with $(sqrt(d_k) / sqrt(d_k +p) )$? But need to maintain the same output for the model?
 
 = Problem
 Goal:
@@ -74,7 +74,7 @@ $
 
 We consider the problem
 $
-  arg min_(dif S) ip(G, dif S)_F "s.t." norm(dif S)_F <= gamma and "rk"(dif S) <= d_k < "rk"(G)
+  arg min_(dif S) ip(G, dif S)_F "s.t." norm(dif S)_F <= gamma
 $
 
 
@@ -100,14 +100,14 @@ Hence, the problem becomes
 $
   dif Z^star &=arg min_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F <= gamma\
   &= - arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F <= gamma \
-  &= - arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F = gamma \
+  &= - arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F = gamma space (*) \
   &= - gamma arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F = 1 \
   &= - gamma / alpha arg min_(dif Z) norm(G - X dif Z X^top)_F^2\
 $
 
 $(*)$ We make the hypothesis that we can always find a $ip(G, X dif Z X^top)_F >0$.
 
-#emoji.fire Justification for $alpha$, $alpha= norm(.)_F$
+#emoji.fire Justification for $alpha$, $alpha= norm(?)_F$
 
 Let $lambda := gamma / alpha$, $P:= arg min_(dif Z) norm(G - X dif Z X^top)^2_F$.
 
@@ -116,9 +116,9 @@ We will first search $P$, then $lambda$ with a line search.
 == Find $P$
 Let
 $
-  f(P)=norm(G - X P X^top)_F^2
+  f(P)=norm(G - X P X^top)_F^2.
 $
-$f$ is convex.
+$P |-> X P X^top$ is linear, $P |-> G-X P X^top$ is affine, and $A |-> norm(A)^2_F$ is convex. $f$ is a composition of those functions, hence is convex.
 
 We have
 $
@@ -129,16 +129,45 @@ $
   gradient_(P) f = 0 <==> X^top X P X^top X = X^top G X
 $
 
-#emoji.fire Better way to find $P$ by considering $X^top (X P X^top - G)X=0$ ?
+=== $X$ full column rank (#emoji.fire true in practice?)
+Under the hypothesis that $X$ has full column ($d_e$) rank, $X^top X$ is invertible, we have the pseudoinverse
+$
+  X^+ =(X^top X)^(-1) X^top
+$
+and the solution
 
-Under the hypothesis that $X^top X$ is invertible ($"rk"(X) =d_e, d_e<d_s$ ), we have the solution
 $
   P^star &= (X^top X)^(-1) X^top G X (X^top X)^(-1) \
   &= (X^top X )^+ X^top G X (X^top X )^+ \
   &= X^+ G (X^+ )^top \
 $
-#emoji.fire Which formula to implement for $P^star$ ?
+#emoji.fire Which formula to implement for $P^star$ ? Numerical stability?
 
+=== $X^top X$ not invertible
+Let
+$
+  cal(A) := P |-> X^top X P X^top X
+$
+If $X^top X$ is not invertible, $X^top X$ is not injective, and under the hypothesis that $X^top X !=0$,
+$
+  X^top X N X^top X=0 &<==> X N X^top =0
+$
+hence
+$
+  ker(cal(A)) ={N in RR^(d_e times d_e) bar X N X^top =0 }
+$
+
+Hence any solution $P_0$ of $X^top X P X^top X = X^top G X$ can be changed by $N in ker(cal(A))$.
+
+$
+  P=P_0+N => X^top X(P_0+N) X^top X=X^top X P_0 X^top X
+$
+We can always take $N=0$.
+
+#emoji.fire Can we take $P_0=X^+ G(X^+ )^top$ ?
+
+
+== Batch
 To account for the batch, there are several ways to average:
 $
   EE_X [(X^top X)^+ X^top G X (X^top X )^+ ] = EE_X [X^+ G ( X^+ )^top ] \
@@ -146,7 +175,16 @@ $
   EE_X [X]^+ EE_X [G] (EE_X [X]^+ )^top \
   EE_X [X^top X]^(-1) EE_X [X^top G X] EE_X [X^top X]^(-1) \
 $
-#emoji.fire Which batch average?
+#emoji.fire Which one to take?
+
+When $d_s >> d_e$, we see with experiments:
+$
+  EE_X [X^top X]^+ EE_X [X^top G X]EE_X [X^top X]^+ -> EE_X [(X^top X)^+ X^top G X (X^top X )^+ ]
+$
+With the left member being cheaper to compute
+
+#emoji.fire Test full pinv VS (if possible inv else pinv)
+
 
 == Line search
 Do a line search to find $lambda$
