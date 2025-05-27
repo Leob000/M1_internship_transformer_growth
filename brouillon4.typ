@@ -102,10 +102,10 @@ $
   &= - arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F <= gamma \
   &= - arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F = gamma space (*) \
   &= - gamma arg max_(dif Z) ip(G, X dif Z X^top)_F "s.t." norm(X dif Z X^top)_F = 1 \
-  &= - gamma / alpha arg min_(dif Z) norm(G - X dif Z X^top)_F^2\
+  &=- gamma / alpha arg min_(dif Z) norm(G - X dif Z X^top)_F^2\
 $
 
-$(*)$ We make the hypothesis that we can always find a $ip(G, X dif Z X^top)_F >0$.
+$(*)$ We make the hypothesis that we can always find a $ip(G, X dif Z X^top)_F <0$.
 
 #emoji.fire Justification for $alpha$, $alpha= norm(?)_F$
 
